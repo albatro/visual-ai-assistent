@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Live2D Avatar · Visual AI Assistant</title>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #111; color: #eee;
+               font: 14px/1.4 -apple-system, "Segoe UI", Roboto, sans-serif; }
+  #app   { display: grid; grid-template-rows: auto 1fr auto auto;
+           height: 100%; }
+  header { padding: 8px 14px; background: #1c1c20;
+           display: flex; gap: 14px; align-items: center;
+           border-bottom: 1px solid #2a2a30; }
+  header .dot { width: 8px; height: 8px; border-radius: 50%;
+                background: #888; box-shadow: 0 0 6px currentColor; }
+  header .dot.ok   { background: #4ade80; color: #4ade80; }
+  header .dot.err  { background: #f87171; color: #f87171; }
+  header .stack    { color: #888; font-size: 12px;
+                     overflow: hidden; text-overflow: ellipsis;
+                     white-space: nowrap; flex: 1; }
+  #stage   { position: relative; overflow: hidden; }
+  #canvas  { width: 100%; height: 100%; display: block; }
+  #overlay { position: absolute; bottom: 8px; left: 12px; right: 12px;
+             pointer-events: none; color: #ddd; font-size: 13px;
+             text-shadow: 0 1px 2px #000; }
+  #overlay .seg { background: rgba(0,0,0,0.45); padding: 6px 10px;
+                  border-radius: 6px; max-width: 80%; display: inline-block; }
+  #controls { padding: 10px 14px; background: #18181c;
+              border-top: 1px solid #2a2a30;
+              display: grid; gap: 8px;
+              grid-template-columns: 1fr auto auto auto; }
+  #controls input[type=text] { background: #222; color: #eee;
+                               border: 1px solid #333; border-radius: 6px;
+                               padding: 8px 10px; font: inherit; }
+  #controls select, #controls button {
+    background: #2a2a30; color: #eee; border: 1px solid #3a3a42;
+    border-radius: 6px; padding: 8px 12px; font: inherit; cursor: pointer; }
+  #controls button.primary { background: #4f46e5; border-color: #4f46e5; }
+  #controls button:disabled { opacity: 0.5; cursor: wait; }
+  #log     { max-height: 110px; overflow-y: auto;
+             padding: 6px 14px; background: #0d0d10;
+             border-top: 1px solid #2a2a30;
+             font: 11px/1.45 ui-monospace, Consolas, monospace; color: #888; }
+  #log .err { color: #f87171; }
+  #log .info { color: #aab; }
+  #model-bar { display: flex; gap: 6px; padding: 6px 14px;
+               background: #15151a; border-top: 1px solid #2a2a30;
+               font-size: 12px; align-items: center; }
+  #model-bar input { flex: 1; background: #222; color: #ccc;
+                     border: 1px solid #333; border-radius: 5px;
+                     padding: 4px 8px; font: 12px ui-monospace, monospace; }
+  #model-bar button { background: #2a2a30; color: #eee;
+                      border: 1px solid #3a3a42; border-radius: 5px;
+                      padding: 4px 10px; cursor: pointer; font-size: 12px; }
+</style>
+
+<!-- Live2D Cubism Core (required by pixi-live2d-display for .model3.json models) -->
+<script src="https://cubism.live2d.com/sdk-web/cubismcore/live2dcubismcore.min.js"></script>
+<!-- PIXI 7 + pixi-live2d-display Cubism 4 build -->
+<script src="https://cdn.jsdelivr.net/npm/pixi.js@7.4.0/dist/pixi.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pixi-live2d-display@0.4.0/dist/cubism4.min.js"></script>
+</head>
+<body>
+<div id="app">
+
+  <header>
+    <span class="dot" id="dot"></span>
+    <strong>Live2D Avatar</strong>
+    <span class="stack" id="stack">connecting…</span>
+  </header>
+
+  <div id="stage">
+    <canvas id="canvas"></canvas>
+    <div id="overlay"><span class="seg" id="seg"></span></div>
+  </div>
+
+  <div id="model-bar">
+    <label>model3.json:</label>
+    <input id="model-url" spellcheck="false"
+      value="https://cdn.jsdelivr.net/gh/guansss/pixi-live2d-display@master/test/assets/haru/haru_greeter_t03.model3.json" />
+    <button id="model-load">Load</button>
+  </div>
+
+  <div id="controls">
+    <input id="text" type="text" placeholder="Спросите Петра I (или текст для say-режима)…" />
+    <select id="mode">
+      <option value="ask">ask (LLM)</option>
+      <option value="say">say (текст→TTS)</option>
+    </select>
+    <select id="tts">
+      <option value="">tts: default</option>
+      <option value="edge">edge</option>
+      <option value="silero">silero</option>
+    </select>
+    <button id="send" class="primary">Send</button>
+  </div>
+
+  <div id="log"></div>
+</div>
+
+<script>
+// ─── helpers ─────────────────────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const log = (msg, cls = '') => {
+  const el = $('log');
+  const ts = new Date().toLocaleTimeString();
+  el.insertAdjacentHTML('beforeend',
+    `<div class="${cls}">[${ts}] ${msg.replace(/[<&]/g, c => ({'<':'&lt;','&':'&amp;'}[c]))}</div>`);
+  el.scrollTop = el.scrollHeight;
+};
+
+// ─── PIXI + Live2D ───────────────────────────────────────────────────────────
+const { Live2DModel } = PIXI.live2d;
+const app = new PIXI.Application({
+  view: $('canvas'),
+  backgroundColor: 0x111111,
+  resizeTo: $('stage'),
+  antialias: true,
+  autoDensity: true,
+  resolution: window.devicePixelRatio || 1,
+});
+
+let model = null;
+let currentRig = {};            // latest received rig parameters
+let modelLoading = false;
+
+async function loadModel(url) {
+  if (modelLoading) return;
+  modelLoading = true;
+  if (model) { app.stage.removeChild(model); model.destroy(); model = null; }
+  log(`Loading model: ${url}`, 'info');
+  try {
+    model = await Live2DModel.from(url, { autoInteract: false });
+    app.stage.addChild(model);
+    fitModel();
+
+    // Disable built-in idle/breath so server-sent params actually stick.
+    // Without this, breath physics keep nudging the mouth back to neutral
+    // 60 times a second and our updates get overwritten.
+    if (model.internalModel.breath) model.internalModel.breath = null;
+    if (model.internalModel.motionManager) {
+      model.internalModel.motionManager.stopAllMotions();
+    }
+
+    // Re-apply our parameters AFTER the engine's per-frame update so they win.
+    const origUpdate = model.internalModel.update.bind(model.internalModel);
+    model.internalModel.update = (dt, now) => {
+      origUpdate(dt, now);
+      const cm = model.internalModel.coreModel;
+      for (const k in currentRig) cm.setParameterValueById(k, currentRig[k]);
+    };
+
+    log(`Model loaded (${Object.keys(model.internalModel.coreModel._parameterIds || {}).length || '?'} params)`);
+  } catch (e) {
+    log(`Model load failed: ${e.message || e}`, 'err');
+  } finally {
+    modelLoading = false;
+  }
+}
+
+function fitModel() {
+  if (!model) return;
+  const w = app.renderer.width  / app.renderer.resolution;
+  const h = app.renderer.height / app.renderer.resolution;
+  // Live2D models are tall; fit by height with a small margin.
+  const scale = (h * 0.95) / model.height;
+  model.scale.set(scale);
+  model.x = (w - model.width)  / 2;
+  model.y = (h - model.height) / 2;
+}
+window.addEventListener('resize', fitModel);
+
+$('model-load').onclick = () => loadModel($('model-url').value.trim());
+
+// ─── Audio playback ──────────────────────────────────────────────────────────
+let currentAudio = null;
+
+function playAudio(bytes, mime) {
+  if (currentAudio) { currentAudio.pause(); currentAudio = null; }
+  const blob = new Blob([bytes], { type: mime });
+  const url  = URL.createObjectURL(blob);
+  const a    = new Audio(url);
+  a.onended = () => URL.revokeObjectURL(url);
+  a.play().catch(e => log(`audio play blocked: ${e.message}`, 'err'));
+  currentAudio = a;
+  return a;
+}
+
+// ─── WebSocket protocol ──────────────────────────────────────────────────────
+const WS_URL = `ws://${location.hostname || 'localhost'}:8082/ws`;
+let ws = null;
+let pendingSegment = null;   // most recent {type:"segment", ...} awaiting its blob
+
+function connect() {
+  $('dot').className = 'dot';
+  $('stack').textContent = 'connecting…';
+  ws = new WebSocket(WS_URL);
+  ws.binaryType = 'arraybuffer';
+
+  ws.onopen = () => {
+    $('dot').className = 'dot ok';
+    log('WS connected');
+  };
+  ws.onclose = () => {
+    $('dot').className = 'dot err';
+    $('stack').textContent = 'disconnected — reconnecting in 2s';
+    log('WS closed', 'err');
+    setTimeout(connect, 2000);
+  };
+  ws.onerror = e => log(`WS error`, 'err');
+
+  ws.onmessage = ev => {
+    if (typeof ev.data === 'string') return handleJson(JSON.parse(ev.data));
+    // Binary frame: must be the audio blob for the most recent segment header
+    if (!pendingSegment) {
+      log('binary frame without preceding segment header', 'err');
+      return;
+    }
+    const seg = pendingSegment; pendingSegment = null;
+    const mime = seg.audio_format === 'mp3' ? 'audio/mpeg' : 'audio/wav';
+    playAudio(ev.data, mime);
+    log(`▶ seg ${seg.idx} · "${seg.text.slice(0, 60)}" · ` +
+        `llm=${seg.llm_ms}ms tts=${seg.tts_ms}ms audio=${seg.duration_ms}ms`);
+  };
+}
+
+function handleJson(m) {
+  switch (m.type) {
+    case 'stack':
+      $('stack').textContent =
+        `llm: ${m.llm} · tts: ${m.tts} · rig: ${m.rig} · ${m.window_hz}Hz`;
+      break;
+    case 'thinking':
+      $('seg').textContent = '…';
+      $('send').disabled = true;
+      break;
+    case 'segment':
+      pendingSegment = m;          // next binary frame is its audio
+      $('seg').textContent = m.text;
+      break;
+    case 'rig':
+      currentRig = m.params;
+      break;
+    case 'segment_end':
+      // optional: idle mouth between segments (rig stream stops anyway)
+      break;
+    case 'answer_complete':
+      $('send').disabled = false;
+      log(`done · ${m.segments} seg · ttft=${m.ttft_ms}ms · ${m.elapsed}s`);
+      // Settle mouth to neutral so it doesn't freeze open between answers.
+      setTimeout(() => { currentRig = { ParamMouthOpenY: 0.0 }; }, 200);
+      break;
+    case 'error':
+      log(`server: ${m.message}`, 'err');
+      $('send').disabled = false;
+      break;
+    default:
+      log(`unknown msg type: ${m.type}`, 'info');
+  }
+}
+
+// ─── Send box ────────────────────────────────────────────────────────────────
+function send() {
+  const text = $('text').value.trim();
+  if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
+  const payload = { text, mode: $('mode').value };
+  const tts = $('tts').value;
+  if (tts) payload.tts = tts;
+  ws.send(JSON.stringify(payload));
+  $('text').value = '';
+}
+$('send').onclick = send;
+$('text').addEventListener('keydown', e => { if (e.key === 'Enter') send(); });
+
+// ─── Go ──────────────────────────────────────────────────────────────────────
+loadModel($('model-url').value);
+connect();
+</script>
+</body>
+</html>

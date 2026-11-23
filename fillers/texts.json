@@ -1,0 +1,47 @@
+[
+  { "id": "f01", "category": "ack",      "text": "Гм, любопытный вопрос." },
+  { "id": "f02", "category": "ack",      "text": "Добрый вопрос задал." },
+  { "id": "f03", "category": "ack",      "text": "Так-так, занятно." },
+  { "id": "f04", "category": "ack",      "text": "Хм, любопытствуешь, значит." },
+  { "id": "f05", "category": "ack",      "text": "О, славный вопрос." },
+  { "id": "f06", "category": "ack",      "text": "Ну, спросил так спросил." },
+  { "id": "f07", "category": "ack",      "text": "Ага, понял к чему ты." },
+
+  { "id": "f08", "category": "think",    "text": "Дай-ка подумаю." },
+  { "id": "f09", "category": "think",    "text": "Сейчас, мысли соберу." },
+  { "id": "f10", "category": "think",    "text": "Минутку, припомню." },
+  { "id": "f11", "category": "think",    "text": "Поразмыслить надо." },
+  { "id": "f12", "category": "think",    "text": "Подожди, соображаю." },
+  { "id": "f13", "category": "think",    "text": "Дай вспомнить, как было." },
+  { "id": "f14", "category": "think",    "text": "Хм, не сразу отвечу." },
+
+  { "id": "f15", "category": "imperial", "text": "Что ж, расскажу." },
+  { "id": "f16", "category": "imperial", "text": "Ну, слушай тогда." },
+  { "id": "f17", "category": "imperial", "text": "Сейчас всё разъясню." },
+  { "id": "f18", "category": "imperial", "text": "Изволь, отвечу." },
+  { "id": "f19", "category": "imperial", "text": "По порядку расскажу." },
+  { "id": "f20", "category": "imperial", "text": "Слушай внимательно." },
+
+  { "id": "f21", "category": "engage",   "text": "О, любимая тема." },
+  { "id": "f22", "category": "engage",   "text": "Давно об этом не думал." },
+  { "id": "f23", "category": "engage",   "text": "А вот это занятно." },
+  { "id": "f24", "category": "engage",   "text": "Любопытно, что спросил." },
+  { "id": "f25", "category": "engage",   "text": "Знаешь, тут есть что сказать." },
+  { "id": "f26", "category": "engage",   "text": "Об этом стоит поговорить." },
+
+  { "id": "f27", "category": "casual",   "text": "Так, погоди." },
+  { "id": "f28", "category": "casual",   "text": "Ладно, начну с главного." },
+  { "id": "f29", "category": "casual",   "text": "Понятно, к чему клонишь." },
+  { "id": "f30", "category": "casual",   "text": "Хороший вопрос, кстати." },
+  { "id": "f31", "category": "casual",   "text": "Ну что, отвечу честно." },
+  { "id": "f32", "category": "casual",   "text": "Постараюсь покороче." },
+
+  { "id": "f33", "category": "pondering","text": "Об этом непросто сказать." },
+  { "id": "f34", "category": "pondering","text": "Тут несколько мыслей." },
+  { "id": "f35", "category": "pondering","text": "Так, по этому делу..." },
+  { "id": "f36", "category": "pondering","text": "Расскажу, как помню." },
+  { "id": "f37", "category": "pondering","text": "Хм, давно про то не вспоминал." },
+  { "id": "f38", "category": "pondering","text": "Ну, по совести скажу." },
+  { "id": "f39", "category": "pondering","text": "Дай-ка верно сформулирую." },
+  { "id": "f40", "category": "pondering","text": "Сейчас, по порядку расскажу." }
+]

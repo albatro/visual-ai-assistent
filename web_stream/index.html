@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Avatar Assistant</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: #0f0f1a;
+            color: #e0e0e0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+        }
+
+        /* ── Левая панель: karaoke + ввод ── */
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 32px 28px;
+            gap: 24px;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-size: 1.2em;
+            font-weight: 300;
+            color: #8888cc;
+            letter-spacing: 1px;
+            flex-shrink: 0;
+        }
+
+        .karaoke-panel {
+            flex: 1;
+            background: #1a1a2e;
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            overflow-y: auto;
+            box-shadow: 0 0 40px rgba(100, 100, 200, 0.08);
+        }
+
+        .karaoke-text {
+            font-size: 1.3em;
+            line-height: 1.9;
+            color: #555;
+            word-wrap: break-word;
+        }
+
+        .karaoke-text .word {
+            display: inline;
+            transition: color 0.15s;
+        }
+
+        .karaoke-text .word.spoken { color: #8888ff; }
+
+        .karaoke-text .word.active {
+            color: #ffffff;
+            text-shadow: 0 0 12px rgba(130, 130, 255, 0.6);
+        }
+
+        /* ── Правая панель: аватар во всю высоту ── */
+        .avatar-wrapper {
+            position: relative;
+            /* ширина = высота экрана × соотношение 1176/1764 ≈ 2/3 */
+            width: calc(100vh * 1176 / 1764);
+            height: 100vh;
+            flex-shrink: 0;
+            background: #0a0a12;
+        }
+
+        #avatar-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            object-fit: contain;
+        }
+
+        .status-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 16px;
+            background: rgba(0, 0, 0, 0.7);
+            font-size: 0.8em;
+            color: #aaa;
+            text-align: center;
+            transition: opacity 0.3s;
+        }
+
+        .status-bar.speaking { color: #6c6; }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+            width: 100%;
+            flex-shrink: 0;
+        }
+
+        #text-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 1px solid #333;
+            border-radius: 12px;
+            background: #1a1a2e;
+            color: #e0e0e0;
+            font-size: 1em;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        #text-input:focus { border-color: #6666aa; }
+        #text-input::placeholder { color: #555; }
+
+        #send-btn {
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            background: #4444aa;
+            color: white;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+
+        #send-btn:hover { background: #5555bb; }
+        #send-btn:disabled { background: #333; cursor: not-allowed; }
+
+        .info {
+            font-size: 0.75em;
+            color: #555;
+            text-align: center;
+        }
+
+        .metrics {
+            width: 100%;
+            background: #14142a;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.8em;
+            color: #aab;
+            max-height: 180px;
+            overflow-y: auto;
+            flex-shrink: 0;
+        }
+
+        .metrics .totals {
+            display: flex;
+            gap: 18px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #2a2a44;
+            padding-bottom: 8px;
+            margin-bottom: 8px;
+        }
+
+        .metrics .totals .m {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .metrics .totals .m .label {
+            font-size: 0.85em;
+            color: #667;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .metrics .totals .m .val {
+            color: #cfd;
+            font-size: 1.1em;
+        }
+
+        .metrics .seg-row {
+            display: grid;
+            grid-template-columns: 32px 1fr repeat(4, auto);
+            gap: 10px;
+            padding: 3px 0;
+            align-items: baseline;
+        }
+
+        .metrics .seg-row .idx { color: #557; }
+        .metrics .seg-row .txt {
+            color: #889;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 260px;
+        }
+        .metrics .seg-row .cell { color: #9b9; min-width: 75px; text-align: right; }
+        .metrics .seg-row .cell.slow { color: #d97; }
+        .metrics .seg-row .cell.fast { color: #6c8; }
+
+        .metrics-header {
+            font-size: 0.7em;
+            color: #557;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+        }
+
+        .stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 18px;
+            border-bottom: 1px solid #2a2a44;
+            padding-bottom: 8px;
+        }
+        .stack .s-row { display: inline-flex; gap: 8px; align-items: baseline; }
+        .stack .s-k {
+            font-size: 0.85em;
+            color: #667;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .stack .s-v { color: #aac; }
+    </style>
+</head>
+<body>
+    <!-- Левая панель -->
+    <div class="left-panel">
+        <h1>AI AVATAR ASSISTANT</h1>
+
+        <div class="karaoke-panel">
+            <div class="karaoke-text" id="karaoke-text"></div>
+        </div>
+
+        <div class="input-area">
+            <input type="text" id="text-input"
+                   placeholder="Введи текст — Пётр его произнесёт..."
+                   autocomplete="off" />
+            <button id="send-btn">Send</button>
+        </div>
+
+        <div class="metrics" id="metrics">
+            <div class="metrics-header">Stack</div>
+            <div class="stack" id="stack">
+                <span class="s-row"><span class="s-k">LLM</span><span class="s-v" id="s-llm">—</span></span>
+                <span class="s-row"><span class="s-k">TTS</span><span class="s-v" id="s-tts">—</span></span>
+                <span class="s-row"><span class="s-k">Lipsync</span><span class="s-v" id="s-lipsync">—</span></span>
+                <span class="s-row"><span class="s-k">FPS</span><span class="s-v" id="s-fps">—</span></span>
+            </div>
+            <div class="metrics-header" style="margin-top:10px;">Latency breakdown</div>
+            <div class="totals" id="totals">
+                <div class="m"><span class="label">TTFT</span><span class="val" id="m-ttft">—</span></div>
+                <div class="m"><span class="label">First frame</span><span class="val" id="m-firstframe">—</span></div>
+                <div class="m"><span class="label">Total</span><span class="val" id="m-total">—</span></div>
+                <div class="m"><span class="label">Segments</span><span class="val" id="m-segs">—</span></div>
+            </div>
+            <div id="seg-rows"></div>
+        </div>
+
+        <div class="info">
+            MuseTalk v1.5 | edge-tts | Chunked streaming
+        </div>
+    </div>
+
+    <!-- Правая панель: аватар во всю высоту -->
+    <div class="avatar-wrapper">
+        <canvas id="avatar-canvas" width="588" height="882"></canvas>
+        <div class="status-bar" id="status-bar">Ready</div>
+    </div>
+
+    <audio id="audio-player" style="display:none"></audio>
+
+    <script>
+        const canvas = document.getElementById('avatar-canvas');
+        const ctx = canvas.getContext('2d');
+        const input = document.getElementById('text-input');
+        const btn = document.getElementById('send-btn');
+        const statusBar = document.getElementById('status-bar');
+        const audioPlayer = document.getElementById('audio-player');
+        const karaokeEl = document.getElementById('karaoke-text');
+        const segRowsEl = document.getElementById('seg-rows');
+        const mTtft = document.getElementById('m-ttft');
+        const mFirstFrame = document.getElementById('m-firstframe');
+        const mTotal = document.getElementById('m-total');
+        const mSegs = document.getElementById('m-segs');
+        let requestStartTs = 0;
+        let firstFrameLogged = false;
+
+        let ws = null;
+        let fps = 24;
+        let karaokeWords = [];
+        let karaokeTimer = null;
+
+        // Segment-based streaming state
+        let segments = [];           // {idx, text, audioBlob, frames[], framesExpected, fps}
+        let receivingIdx = -1;       // segment currently filling
+        let expectingAudio = false;
+        let framesRemaining = 0;
+        let playingIdx = -1;
+        let isPlayingSegment = false;
+
+        // Filler clip state (pre-rendered "let me think..." audio)
+        let expectingFillerAudio = false;
+        let pendingFiller = null;    // {id, text, duration_ms}
+        let playingFiller = false;
+        let fillerObjectUrl = null;
+
+        // ─── WebSocket ──────────────────────────────────────────────────
+        function connect() {
+            const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${location.host}/ws`);
+
+            ws.onopen = () => {
+                setStatus('Connected');
+                btn.disabled = false;
+            };
+
+            ws.onclose = () => {
+                setStatus('Disconnected. Reconnecting...');
+                btn.disabled = true;
+                setTimeout(connect, 2000);
+            };
+
+            ws.onerror = () => ws.close();
+
+            ws.onmessage = async (event) => {
+                if (event.data instanceof Blob) {
+                    if (expectingFillerAudio) {
+                        expectingFillerAudio = false;
+                        playFiller(event.data);
+                        return;
+                    }
+                    const seg = segments[receivingIdx];
+                    if (!seg) return;
+                    if (expectingAudio) {
+                        seg.audioBlob = event.data;
+                        expectingAudio = false;
+                        console.log(`[ws] seg ${seg.idx} audio ${event.data.size}b`);
+                        tryStartPlayback();
+                    } else if (framesRemaining > 0) {
+                        const bytes = await event.data.arrayBuffer();
+                        seg.frames.push(new Uint8Array(bytes));
+                        framesRemaining--;
+                    }
+                } else {
+                    const obj = JSON.parse(event.data);
+                    console.log('[ws]', obj);
+                    handleMessage(obj);
+                }
+            };
+        }
+
+        function handleMessage(msg) {
+            switch (msg.type) {
+                case 'stack':
+                    document.getElementById('s-llm').textContent = msg.llm || '—';
+                    document.getElementById('s-tts').textContent = msg.tts || '—';
+                    document.getElementById('s-lipsync').textContent = msg.lipsync || '—';
+                    document.getElementById('s-fps').textContent = msg.fps ?? '—';
+                    if (msg.fps) fps = msg.fps;
+                    break;
+
+                case 'thinking':
+                    setStatus('Думаю...');
+                    karaokeEl.textContent = '';
+                    segments = [];
+                    receivingIdx = -1;
+                    playingIdx = -1;
+                    isPlayingSegment = false;
+                    stopFiller();
+                    resetMetrics();
+                    break;
+
+                case 'filler':
+                    // Pre-rendered short phrase to mask latency.
+                    // Next binary blob = filler audio.
+                    pendingFiller = msg;
+                    expectingFillerAudio = true;
+                    setStatus(`Filler: ${msg.text}`);
+                    break;
+
+                case 'segment':
+                    // Start a new segment: header → audio blob → N frame blobs
+                    receivingIdx = msg.idx;
+                    expectingAudio = true;
+                    framesRemaining = msg.frame_count;
+                    fps = msg.fps || fps;
+                    segments[msg.idx] = {
+                        idx: msg.idx,
+                        text: msg.text,
+                        audioBlob: null,
+                        frames: [],
+                        framesExpected: msg.frame_count,
+                        fps: msg.fps || fps,
+                    };
+                    appendKaraokeSentence(msg.text);
+                    setStatus(`Segment ${msg.idx + 1}`);
+                    addSegmentRow(msg);
+                    if (msg.idx === 0 && msg.llm_ms != null) {
+                        mTtft.textContent = `${msg.llm_ms} ms`;
+                    }
+                    break;
+
+                case 'segment_end':
+                    // All bytes for this segment received
+                    break;
+
+                case 'answer_complete':
+                    setStatus(`Done in ${msg.elapsed}s`);
+                    btn.disabled = false;
+                    if (msg.ttft_ms != null) mTtft.textContent = `${msg.ttft_ms} ms`;
+                    mTotal.textContent = `${msg.elapsed} s`;
+                    mSegs.textContent = msg.segments ?? '—';
+                    break;
+
+                case 'error':
+                    setStatus(`Error: ${msg.message}`);
+                    btn.disabled = false;
+                    break;
+            }
+        }
+
+        // ─── Filler playback ────────────────────────────────────────────
+        function playFiller(blob) {
+            if (fillerObjectUrl) URL.revokeObjectURL(fillerObjectUrl);
+            fillerObjectUrl = URL.createObjectURL(blob);
+            audioPlayer.src = fillerObjectUrl;
+            audioPlayer.onended = () => { playingFiller = false; };
+            const p = audioPlayer.play();
+            if (p) p.catch(e => console.warn('filler play:', e));
+            playingFiller = true;
+        }
+
+        function stopFiller() {
+            if (!playingFiller) return;
+            try { audioPlayer.pause(); } catch (e) {}
+            audioPlayer.src = '';
+            if (fillerObjectUrl) {
+                URL.revokeObjectURL(fillerObjectUrl);
+                fillerObjectUrl = null;
+            }
+            playingFiller = false;
+        }
+
+        // ─── Sequential segment playback ────────────────────────────────
+        function tryStartPlayback() {
+            if (isPlayingSegment) return;
+            const nextIdx = playingIdx + 1;
+            const seg = segments[nextIdx];
+            if (!seg || !seg.audioBlob) return;
+            playingIdx = nextIdx;
+            playSegment(seg);
+        }
+
+        function playSegment(seg) {
+            isPlayingSegment = true;
+            statusBar.classList.add('speaking');
+
+            // First real segment overrides any in-flight filler audio.
+            stopFiller();
+
+            const audioUrl = URL.createObjectURL(seg.audioBlob);
+            audioPlayer.src = audioUrl;
+            const playPromise = audioPlayer.play();
+            if (playPromise) playPromise.catch(e => console.warn('audio play:', e));
+
+            audioPlayer.onended = () => {
+                URL.revokeObjectURL(audioUrl);
+                isPlayingSegment = false;
+                statusBar.classList.remove('speaking');
+                // Move on to the next segment if it's ready, else wait
+                tryStartPlayback();
+            };
+
+            // Karaoke this segment's text in step with its audio
+            karaokeForSegment(seg);
+
+            // Frame render loop at segment.fps; frames may still be arriving
+            const frameDur = 1000 / seg.fps;
+            let frameIdx = 0;
+            function renderFrame() {
+                if (frameIdx < seg.frames.length) {
+                    const blob = new Blob([seg.frames[frameIdx]], { type: 'image/jpeg' });
+                    const url = URL.createObjectURL(blob);
+                    const img = new Image();
+                    img.onload = () => {
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                        URL.revokeObjectURL(url);
+                        if (!firstFrameLogged) {
+                            firstFrameLogged = true;
+                            const ms = Math.round(performance.now() - requestStartTs);
+                            mFirstFrame.textContent = `${ms} ms`;
+                        }
+                    };
+                    img.src = url;
+                    frameIdx++;
+                    setTimeout(renderFrame, frameDur);
+                } else if (frameIdx < seg.framesExpected) {
+                    // still arriving — wait briefly
+                    setTimeout(renderFrame, 30);
+                }
+            }
+            renderFrame();
+        }
+
+        // ─── UI ─────────────────────────────────────────────────────────
+        function setStatus(text) {
+            statusBar.textContent = text;
+        }
+
+        function fmtMs(ms) {
+            return ms >= 1000 ? `${(ms / 1000).toFixed(2)}s` : `${ms}ms`;
+        }
+
+        function resetMetrics() {
+            segRowsEl.innerHTML = '';
+            mTtft.textContent = '—';
+            mFirstFrame.textContent = '—';
+            mTotal.textContent = '—';
+            mSegs.textContent = '—';
+            requestStartTs = performance.now();
+            firstFrameLogged = false;
+        }
+
+        function addSegmentRow(msg) {
+            const audioMs = Math.round((msg.frame_count / msg.fps) * 1000);
+            // gen_ms vs audio_ms tells you if MuseTalk is realtime for this segment
+            const realtimeRatio = msg.gen_ms / audioMs;
+            const genClass = realtimeRatio <= 1.0 ? 'fast' : (realtimeRatio <= 1.5 ? '' : 'slow');
+            const row = document.createElement('div');
+            row.className = 'seg-row';
+            row.innerHTML = `
+                <span class="idx">#${msg.idx + 1}</span>
+                <span class="txt" title="${msg.text.replace(/"/g, '&quot;')}">${msg.text}</span>
+                <span class="cell">LLM ${fmtMs(msg.llm_ms)}</span>
+                <span class="cell">TTS ${fmtMs(msg.tts_ms)}</span>
+                <span class="cell ${genClass}">Gen ${fmtMs(msg.gen_ms)} · ${msg.gen_fps}fps</span>
+                <span class="cell">${msg.frame_count}f / ${fmtMs(audioMs)}</span>
+            `;
+            segRowsEl.appendChild(row);
+        }
+
+        function appendKaraokeSentence(text) {
+            const start = karaokeWords.length;
+            const words = text.split(/\s+/).filter(Boolean);
+            const html = words.map((w, i) =>
+                `<span class="word" data-idx="${start + i}">${w} </span>`
+            ).join('');
+            karaokeEl.insertAdjacentHTML('beforeend', html);
+            karaokeWords = karaokeEl.querySelectorAll('.word');
+        }
+
+        function karaokeForSegment(seg) {
+            // Highlight only this segment's words across the duration of its audio
+            const idsThis = [];
+            karaokeEl.querySelectorAll('.word').forEach((el, i) => {
+                // Match by raw text — segments are appended in order
+                idsThis.push(el);
+            });
+            // Find this segment's slice: count words across earlier segments
+            let offset = 0;
+            for (let i = 0; i < seg.idx; i++) {
+                if (segments[i]) offset += segments[i].text.split(/\s+/).filter(Boolean).length;
+            }
+            const myWords = seg.text.split(/\s+/).filter(Boolean).length;
+            const slice = Array.from(karaokeEl.querySelectorAll('.word')).slice(offset, offset + myWords);
+
+            if (karaokeTimer) clearInterval(karaokeTimer);
+            // Time per word based on audio duration once known
+            const startKaraoke = () => {
+                const dur = (audioPlayer.duration || (seg.framesExpected / seg.fps)) * 1000;
+                const per = dur / Math.max(slice.length, 1);
+                let wi = 0;
+                karaokeTimer = setInterval(() => {
+                    if (wi >= slice.length) {
+                        clearInterval(karaokeTimer);
+                        karaokeTimer = null;
+                        return;
+                    }
+                    if (wi > 0) {
+                        slice[wi - 1].classList.remove('active');
+                        slice[wi - 1].classList.add('spoken');
+                    }
+                    slice[wi].classList.add('active');
+                    wi++;
+                }, per);
+            };
+            if (audioPlayer.duration && !isNaN(audioPlayer.duration)) {
+                startKaraoke();
+            } else {
+                audioPlayer.addEventListener('loadedmetadata', startKaraoke, { once: true });
+            }
+        }
+
+        function send() {
+            const text = input.value.trim();
+            if (!text || !ws || ws.readyState !== WebSocket.OPEN) return;
+            btn.disabled = true;
+            karaokeEl.textContent = '';
+            karaokeWords = [];
+            resetMetrics();
+            ws.send(JSON.stringify({ text, mode: "say" }));
+            input.value = '';
+        }
+
+        btn.addEventListener('click', send);
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') send();
+        });
+
+        // Initial state
+        ctx.fillStyle = '#0a0a12';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        connect();
+    </script>
+</body>
+</html>

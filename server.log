@@ -1,0 +1,77 @@
+[Server] Initializing MuseTalk engine...
+[MuseTalk] Loading VAE + UNet + PE...
+load unet model from C:\Users\User\DEV\visual-ai-assistent\MuseTalk\models\musetalkV15\unet.pth
+[MuseTalk] Loading Whisper...
+[MuseTalk] Loading FaceParsing...
+[MuseTalk] All models loaded successfully.
+[MuseTalk] Loading cached avatar 'peter_stream'...
+reading images...
+reading images...
+[Server] Loading full-body background from kling_peter_ref.mp4...
+[Server] Cached 722 background frames (1176x1764)
+[Fillers] Loaded 40 clips (662 KB in RAM)
+[Server] Engine ready!
+[Server] Starting on http://localhost:8080
+[WS] Client connected
+[WS] Client disconnected
+[WS] Client connected
+[WS] Client disconnected
+[WS] Client connected
+[WS] Client disconnected
+[WS] Client connected
+[WS] Client disconnected
+[WS] Client connected
+[WS] Client disconnected
+[WS] Client connected
+[WS] Received (say, tts=edge): привет...
+[MuseTalk] Audio processed in 1312ms
+[MuseTalk] Generated 40 frames in 1.92s (20.8 FPS)
+[Seg 0] llm=0ms tts=1181ms gen=3236ms frames=40 text='привет'
+[WS] Received (say, tts=edge): я тут не один...
+[MuseTalk] Audio processed in 18ms
+[MuseTalk] Generated 57 frames in 2.59s (22.0 FPS)
+[Seg 0] llm=0ms tts=2126ms gen=2606ms frames=57 text='я тут не один'
+[WS] Received (say, tts=edge): Я, Пётр Алексеевич, царь и император всея Руси, поднял страну из векового сна. К...
+[MuseTalk] Audio processed in 70ms
+[MuseTalk] Generated 1478 frames in 62.04s (23.8 FPS)
+[Seg 0] llm=0ms tts=16943ms gen=62109ms frames=1478 text='Я, Пётр Алексеевич, царь и император всея Руси, поднял стран'
+[WS] Client disconnected
+[WS] Client connected
+[WS] Received (say, tts=edge): Я, Пётр Алексеевич, царь и император всея Руси, поднял страну из векового сна. К...
+[MuseTalk] Audio processed in 24ms
+[MuseTalk] Generated 370 frames in 15.44s (24.0 FPS)
+[Seg 0] llm=0ms tts=4392ms gen=15466ms frames=370 text='Я, Пётр Алексеевич, царь и император всея Руси, поднял стран'
+[WS] Received (say, tts=edge): привет...
+[MuseTalk] Audio processed in 25ms
+[MuseTalk] Generated 40 frames in 1.68s (23.8 FPS)
+[Seg 0] llm=0ms tts=1194ms gen=1711ms frames=40 text='привет'
+[WS] Received (say, tts=edge): Я, Пётр Алексеевич, царь и император всея Руси, поднял страну из векового сна. К...
+[MuseTalk] Audio processed in 21ms
+[MuseTalk] Generated 370 frames in 15.50s (23.9 FPS)
+[Seg 0] llm=0ms tts=1675ms gen=15520ms frames=370 text='Я, Пётр Алексеевич, царь и император всея Руси, поднял стран'
+[WS] Received (say, tts=edge): Я, Пётр Алексеевич, царь и император всея Руси, поднял страну из векового сна. К...
+[MuseTalk] Audio processed in 28ms
+[MuseTalk] Generated 370 frames in 15.43s (24.0 FPS)
+[Seg 0] llm=0ms tts=1509ms gen=15461ms frames=370 text='Я, Пётр Алексеевич, царь и император всея Руси, поднял стран'
+[WS] Received (say, tts=edge): привет...
+[MuseTalk] Audio processed in 13ms
+[MuseTalk] Generated 40 frames in 1.72s (23.3 FPS)
+[Seg 0] llm=0ms tts=1503ms gen=1733ms frames=40 text='привет'
+[WS] Received (say, tts=edge): Зачем ты построил Санкт-Петербург?...
+[MuseTalk] Audio processed in 15ms
+[MuseTalk] Generated 81 frames in 3.56s (22.7 FPS)
+[Seg 0] llm=0ms tts=1928ms gen=3581ms frames=81 text='Зачем ты построил Санкт-Петербург?'
+[WS] Received (say, tts=edge): Я Пётр первый. У меня зелёный кафтан и чёрные сапоги....
+[MuseTalk] Audio processed in 18ms
+[MuseTalk] Generated 146 frames in 6.22s (23.5 FPS)
+[Seg 0] llm=0ms tts=3613ms gen=6236ms frames=146 text='Я Пётр первый. У меня зелёный кафтан и чёрные сапоги.'
+[WS] Received (say, tts=edge): Я Пётр первый. У меня зелёный кафтан и чёрные сапоги....
+[MuseTalk] Audio processed in 20ms
+[MuseTalk] Generated 146 frames in 6.19s (23.6 FPS)
+[Seg 0] llm=0ms tts=1499ms gen=6208ms frames=146 text='Я Пётр первый. У меня зелёный кафтан и чёрные сапоги.'
+[WS] Received (say, tts=edge): Я Пётр первый. У меня зелёный кафтан и чёрные сапоги. Я Пётр первый. У меня зелё...
+[MuseTalk] Audio processed in 21ms
+[MuseTalk] Generated 436 frames in 17.97s (24.3 FPS)
+[Seg 0] llm=0ms tts=7105ms gen=17996ms frames=436 text='Я Пётр первый. У меня зелёный кафтан и чёрные сапоги. Я Пётр'
+[WS] Received (say, tts=edge): Я Пётр первый. У меня зелёный кафтан и чёрные сапоги. Я Пётр первый. У меня зелё...
+[MuseTalk] Audio processed in 40ms

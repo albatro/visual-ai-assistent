@@ -1,0 +1,322 @@
+[
+  {
+    "id": "f01",
+    "text": "Гм, любопытный вопрос.",
+    "category": "ack",
+    "mp3": "audio/f01.mp3",
+    "wav": "audio/f01.wav",
+    "duration_ms": 2952
+  },
+  {
+    "id": "f02",
+    "text": "Добрый вопрос задал.",
+    "category": "ack",
+    "mp3": "audio/f02.mp3",
+    "wav": "audio/f02.wav",
+    "duration_ms": 2616
+  },
+  {
+    "id": "f03",
+    "text": "Так-так, занятно.",
+    "category": "ack",
+    "mp3": "audio/f03.mp3",
+    "wav": "audio/f03.wav",
+    "duration_ms": 2688
+  },
+  {
+    "id": "f04",
+    "text": "Хм, любопытствуешь, значит.",
+    "category": "ack",
+    "mp3": "audio/f04.mp3",
+    "wav": "audio/f04.wav",
+    "duration_ms": 3504
+  },
+  {
+    "id": "f05",
+    "text": "О, славный вопрос.",
+    "category": "ack",
+    "mp3": "audio/f05.mp3",
+    "wav": "audio/f05.wav",
+    "duration_ms": 2568
+  },
+  {
+    "id": "f06",
+    "text": "Ну, спросил так спросил.",
+    "category": "ack",
+    "mp3": "audio/f06.mp3",
+    "wav": "audio/f06.wav",
+    "duration_ms": 3216
+  },
+  {
+    "id": "f07",
+    "text": "Ага, понял к чему ты.",
+    "category": "ack",
+    "mp3": "audio/f07.mp3",
+    "wav": "audio/f07.wav",
+    "duration_ms": 3000
+  },
+  {
+    "id": "f08",
+    "text": "Дай-ка подумаю.",
+    "category": "think",
+    "mp3": "audio/f08.mp3",
+    "wav": "audio/f08.wav",
+    "duration_ms": 2448
+  },
+  {
+    "id": "f09",
+    "text": "Сейчас, мысли соберу.",
+    "category": "think",
+    "mp3": "audio/f09.mp3",
+    "wav": "audio/f09.wav",
+    "duration_ms": 3096
+  },
+  {
+    "id": "f10",
+    "text": "Минутку, припомню.",
+    "category": "think",
+    "mp3": "audio/f10.mp3",
+    "wav": "audio/f10.wav",
+    "duration_ms": 2712
+  },
+  {
+    "id": "f11",
+    "text": "Поразмыслить надо.",
+    "category": "think",
+    "mp3": "audio/f11.mp3",
+    "wav": "audio/f11.wav",
+    "duration_ms": 2400
+  },
+  {
+    "id": "f12",
+    "text": "Подожди, соображаю.",
+    "category": "think",
+    "mp3": "audio/f12.mp3",
+    "wav": "audio/f12.wav",
+    "duration_ms": 2808
+  },
+  {
+    "id": "f13",
+    "text": "Дай вспомнить, как было.",
+    "category": "think",
+    "mp3": "audio/f13.mp3",
+    "wav": "audio/f13.wav",
+    "duration_ms": 3024
+  },
+  {
+    "id": "f14",
+    "text": "Хм, не сразу отвечу.",
+    "category": "think",
+    "mp3": "audio/f14.mp3",
+    "wav": "audio/f14.wav",
+    "duration_ms": 3048
+  },
+  {
+    "id": "f15",
+    "text": "Что ж, расскажу.",
+    "category": "imperial",
+    "mp3": "audio/f15.mp3",
+    "wav": "audio/f15.wav",
+    "duration_ms": 2760
+  },
+  {
+    "id": "f16",
+    "text": "Ну, слушай тогда.",
+    "category": "imperial",
+    "mp3": "audio/f16.mp3",
+    "wav": "audio/f16.wav",
+    "duration_ms": 2760
+  },
+  {
+    "id": "f17",
+    "text": "Сейчас всё разъясню.",
+    "category": "imperial",
+    "mp3": "audio/f17.mp3",
+    "wav": "audio/f17.wav",
+    "duration_ms": 2760
+  },
+  {
+    "id": "f18",
+    "text": "Изволь, отвечу.",
+    "category": "imperial",
+    "mp3": "audio/f18.mp3",
+    "wav": "audio/f18.wav",
+    "duration_ms": 2616
+  },
+  {
+    "id": "f19",
+    "text": "По порядку расскажу.",
+    "category": "imperial",
+    "mp3": "audio/f19.mp3",
+    "wav": "audio/f19.wav",
+    "duration_ms": 2472
+  },
+  {
+    "id": "f20",
+    "text": "Слушай внимательно.",
+    "category": "imperial",
+    "mp3": "audio/f20.mp3",
+    "wav": "audio/f20.wav",
+    "duration_ms": 2544
+  },
+  {
+    "id": "f21",
+    "text": "О, любимая тема.",
+    "category": "engage",
+    "mp3": "audio/f21.mp3",
+    "wav": "audio/f21.wav",
+    "duration_ms": 2688
+  },
+  {
+    "id": "f22",
+    "text": "Давно об этом не думал.",
+    "category": "engage",
+    "mp3": "audio/f22.mp3",
+    "wav": "audio/f22.wav",
+    "duration_ms": 2592
+  },
+  {
+    "id": "f23",
+    "text": "А вот это занятно.",
+    "category": "engage",
+    "mp3": "audio/f23.mp3",
+    "wav": "audio/f23.wav",
+    "duration_ms": 2568
+  },
+  {
+    "id": "f24",
+    "text": "Любопытно, что спросил.",
+    "category": "engage",
+    "mp3": "audio/f24.mp3",
+    "wav": "audio/f24.wav",
+    "duration_ms": 2952
+  },
+  {
+    "id": "f25",
+    "text": "Знаешь, тут есть что сказать.",
+    "category": "engage",
+    "mp3": "audio/f25.mp3",
+    "wav": "audio/f25.wav",
+    "duration_ms": 3360
+  },
+  {
+    "id": "f26",
+    "text": "Об этом стоит поговорить.",
+    "category": "engage",
+    "mp3": "audio/f26.mp3",
+    "wav": "audio/f26.wav",
+    "duration_ms": 2736
+  },
+  {
+    "id": "f27",
+    "text": "Так, погоди.",
+    "category": "casual",
+    "mp3": "audio/f27.mp3",
+    "wav": "audio/f27.wav",
+    "duration_ms": 2280
+  },
+  {
+    "id": "f28",
+    "text": "Ладно, начну с главного.",
+    "category": "casual",
+    "mp3": "audio/f28.mp3",
+    "wav": "audio/f28.wav",
+    "duration_ms": 3168
+  },
+  {
+    "id": "f29",
+    "text": "Понятно, к чему клонишь.",
+    "category": "casual",
+    "mp3": "audio/f29.mp3",
+    "wav": "audio/f29.wav",
+    "duration_ms": 2952
+  },
+  {
+    "id": "f30",
+    "text": "Хороший вопрос, кстати.",
+    "category": "casual",
+    "mp3": "audio/f30.mp3",
+    "wav": "audio/f30.wav",
+    "duration_ms": 2928
+  },
+  {
+    "id": "f31",
+    "text": "Ну что, отвечу честно.",
+    "category": "casual",
+    "mp3": "audio/f31.mp3",
+    "wav": "audio/f31.wav",
+    "duration_ms": 3144
+  },
+  {
+    "id": "f32",
+    "text": "Постараюсь покороче.",
+    "category": "casual",
+    "mp3": "audio/f32.mp3",
+    "wav": "audio/f32.wav",
+    "duration_ms": 2472
+  },
+  {
+    "id": "f33",
+    "text": "Об этом непросто сказать.",
+    "category": "pondering",
+    "mp3": "audio/f33.mp3",
+    "wav": "audio/f33.wav",
+    "duration_ms": 2736
+  },
+  {
+    "id": "f34",
+    "text": "Тут несколько мыслей.",
+    "category": "pondering",
+    "mp3": "audio/f34.mp3",
+    "wav": "audio/f34.wav",
+    "duration_ms": 2472
+  },
+  {
+    "id": "f35",
+    "text": "Так, по этому делу...",
+    "category": "pondering",
+    "mp3": "audio/f35.mp3",
+    "wav": "audio/f35.wav",
+    "duration_ms": 2520
+  },
+  {
+    "id": "f36",
+    "text": "Расскажу, как помню.",
+    "category": "pondering",
+    "mp3": "audio/f36.mp3",
+    "wav": "audio/f36.wav",
+    "duration_ms": 2856
+  },
+  {
+    "id": "f37",
+    "text": "Хм, давно про то не вспоминал.",
+    "category": "pondering",
+    "mp3": "audio/f37.mp3",
+    "wav": "audio/f37.wav",
+    "duration_ms": 3312
+  },
+  {
+    "id": "f38",
+    "text": "Ну, по совести скажу.",
+    "category": "pondering",
+    "mp3": "audio/f38.mp3",
+    "wav": "audio/f38.wav",
+    "duration_ms": 3024
+  },
+  {
+    "id": "f39",
+    "text": "Дай-ка верно сформулирую.",
+    "category": "pondering",
+    "mp3": "audio/f39.mp3",
+    "wav": "audio/f39.wav",
+    "duration_ms": 3024
+  },
+  {
+    "id": "f40",
+    "text": "Сейчас, по порядку расскажу.",
+    "category": "pondering",
+    "mp3": "audio/f40.mp3",
+    "wav": "audio/f40.wav",
+    "duration_ms": 3288
+  }
+]
